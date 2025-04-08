@@ -68,7 +68,6 @@ int main() {
 
          else if(sOrB == 'B')
          {
-             std::string accumulateBraille;
              std::string reading;
              std::vector<string> brailleDigits;
              for (int i = 0; i < 3; ++i)
@@ -77,21 +76,13 @@ int main() {
                  {
                      if (i == 0)
                      {
-                          if (j % 2 == 0)
-                          {
-                              accumulateBraille = "";
-                          }
                           std::cin >> reading;
-                          accumulateBraille += reading;
-                          if (j % 2 == 1) 
-                          {
-                              brailleDigits.pushback(accumulateBraille);
-                          }
+                          brailleDigits.pushback(reading);
                      }
                      else if (i == 1)
                      {
                          std::cin >> reading;
-                         brailleDigits[abs(j - 1) / 2] += reading;
+                         brailleDigits[j] += reading;
                      }
                      else
                      {
