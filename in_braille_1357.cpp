@@ -77,20 +77,18 @@ int main() {
                      std::string reading;
                      if (i == 0)
                      {
-                          if (j % == 0)
+                          if (j % 2 == 0)
                           {
-                              xxx = ""
-                              std::cin >> reading;
-                              xxx += reading;
+                              xxx = "";
                           }
-                          else 
+                          std::cin >> reading;
+                          xxx += reading;
+                          if (j % 2 == 1) 
                           {
-                              std::cin >> reading;
-                              xxx += reading;
                               brailleDigits.pushback(xxx);
                           }
                      }
-                     else if (i == 2)
+                     else if (i == 1)
                      {
                          std::cin >> reading;
                          brailleDigits[abs(j - 1) / 2] += reading;
