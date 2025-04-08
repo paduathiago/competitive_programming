@@ -66,17 +66,38 @@ int main() {
             }
         }
 
-        // else if(sOrB == 'B')
-        // {
-        //     std::vector<std::vector<char>> brailleDigits;
-        //     for (int i = 0; i < 2; ++i)
-        //     {
-        //         for (int j = 0; j < digits; ++j)
-        //         {
-                    
-        //         }
-        //     }
-        // }
+         else if(sOrB == 'B')
+         {
+             std::string xxx = ""
+             std::vector<std::vector<std::string>> brailleDigits;
+             for (int i = 0; i < 2; ++i)
+             {
+                 for (int j = 0; j < digits; ++j)
+                 {
+                     std::string reading;
+                     if (i == 0)
+                     {
+                          if (j % == 0)
+                          {
+                              xxx = ""
+                              std::cin >> reading;
+                              xxx += reading;
+                          }
+                          else 
+                          {
+                              std::cin >> reading;
+                              xxx += reading;
+                              brailleDigits.pushback(xxx);
+                          }
+                     }
+                     else if (i == 2)
+                     {
+                         std::cin >> reading;
+                         brailleDigits[abs(j - 1) / 2] += reading;
+                     }
+                 }
+             }
+        }
     }
 
     return 0;
