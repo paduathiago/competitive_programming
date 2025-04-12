@@ -100,13 +100,6 @@ int main() {
         }
 
         std::cout << originalGeneratesFoldedTape(originalTape, foldedTape) << std::endl;
-        // std::vector<unsigned> test = foldTape(originalTape, 2);
-        // std::cout << "test: ";
-        // for (unsigned i = 0; i < test.size(); ++i)
-        // {
-        //     std::cout << test[i] << " ";
-        // }
-        // std::cout << std::endl;
     }
 
     return 0;
