@@ -7,61 +7,51 @@ bool isFoldedTapeTheOriginalReversed(const std::vector<unsigned>& tape, const st
     return std::equal(tape.begin(), tape.end(), foldedTape.rbegin());
 }
 
-unsigned newTapeSize(const int foldingPosition, int originalTapeSize)
-{
-    return std::max(foldingPosition, originalTapeSize - foldingPosition);
-}
-
 std::vector<unsigned> foldTape(const std::vector<unsigned>& tape, const int foldingPosition)
 {
     int tapeSize = tape.size();
-    std::vector<unsigned> foldedTape(newTapeSize(foldingPosition, tapeSize));
-    // std::cout << "foldedTape size: " << foldedTape.size() << std::endl;
+    int left = foldingPosition;
+    int right = tapeSize - foldingPosition;
+    std::vector<unsigned> foldedTape(std::max(left, right));
 
-    int positionsFilled;
-
-    if (foldingPosition < tapeSize / 2)
+    if (left <= right)
     {
-        for (positionsFilled = 0; positionsFilled < abs(foldingPosition - (static_cast<int>(tapeSize) - foldingPosition)); ++positionsFilled)
+        int i = tapeSize - 1;
+        int j = 0;
+        int k = right - left;
+        while (k > 0)
         {
-            foldedTape[positionsFilled] = tape[tapeSize - 1 - positionsFilled];
+            foldedTape[j] = tape[i];
+            --i;
+            ++j;
+            --k;
+        }
+        while (k < i)
+        {
+            foldedTape[j] = tape[k] + tape[i];
+            --i;
+            ++k;
+            ++j;
+        }
+    }
+    else
+    {
+        int i = 0;
+        while (i < left - right)
+        {
+            foldedTape[i] = tape[i];
+            ++i;
+        }
+
+        int k = tapeSize - 1;
+        while (i < k)
+        {
+            foldedTape[i] = tape[i] + tape[k];
+            ++i;
+            --k;
         }
     }
 
-    // There will be elements left over on the right of the original tape (they won't be summed with any other element)
-    else if (foldingPosition > tapeSize / 2 || (foldingPosition == tapeSize && tapeSize % 2 == 0))
-    {
-        for (positionsFilled = 0; positionsFilled < abs(foldingPosition - (static_cast<int>(tapeSize) - foldingPosition)); ++positionsFilled)
-        {
-            foldedTape[positionsFilled] = tape[positionsFilled];
-        }
-    }
-
-    else // fold an even sized tape on its center
-    {
-        for (int i = 0; i < tapeSize / 2; ++i)
-        {
-            foldedTape[i] = tape[i] + tape[tapeSize - i - 1];
-            return foldedTape;
-        }
-    }
-
-    // std::cout << "positionsFilled: " << positionsFilled << std::endl;
-    int j = 0;
-    int k = positionsFilled;
-    for (int i = positionsFilled; i < tapeSize; ++i)
-    {
-        foldedTape[i] = tape[j] + tape[k];
-        --k;
-        ++j;
-        // std::cout << k << " " << j << std::endl;
-    }
-
-    // std::cout << "Folded tape: ";
-    // for (unsigned element : foldedTape) {
-    //     std::cout << element << " ";
-    // }
-    // std::cout << std::endl;
     return foldedTape;
 
 }
@@ -99,22 +89,24 @@ int main() {
         std::vector<unsigned> originalTape(originalTapeSize);
         for (unsigned i = 0; i < originalTapeSize; ++i)
         {
-            int tapeElement;
-            std::cin >> tapeElement;
-            originalTape[i] = tapeElement;
+            std::cin >> originalTape[i];
         }
 
         std::cin >> foldedTapeSize;
         std::vector<unsigned> foldedTape(foldedTapeSize);
         for (unsigned i = 0; i < foldedTapeSize; ++i)
         {
-            int tapeElement;
-            std::cin >> tapeElement;
-            foldedTape[i] = tapeElement;
+            std::cin >> foldedTape[i];
         }
 
         std::cout << originalGeneratesFoldedTape(originalTape, foldedTape) << std::endl;
         // std::vector<unsigned> test = foldTape(originalTape, 2);
+        // std::cout << "test: ";
+        // for (unsigned i = 0; i < test.size(); ++i)
+        // {
+        //     std::cout << test[i] << " ";
+        // }
+        // std::cout << std::endl;
     }
 
     return 0;
