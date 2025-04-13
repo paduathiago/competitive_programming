@@ -48,11 +48,12 @@ int main() {
     {
         std::vector<std::vector<int>> board(rows, std::vector<int>(columns, 0));
         std::vector<std::pair<int, int>> myPieces;
+        int k = 0;
         for (int i = rows - 1; i >= 0; --i)
         {
             for (int j = 0; j < columns; ++j)
             {
-                if (i % 2 == 0)
+                if (k % 2 == 0)
                 {
                     if(j % 2 == 1)
                         board[i][j] = -1;
@@ -79,6 +80,7 @@ int main() {
                     }
                 }
             }
+            ++k;
         }
 
 
