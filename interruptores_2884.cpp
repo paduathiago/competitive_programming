@@ -1,4 +1,6 @@
+#include <bitset>
 #include <iostream>
+#include <unordered_set>
 #include <vector>
 
 int main() {
@@ -7,10 +9,12 @@ int main() {
 
     int L;
     std::cin >> L;
-    std::vector<int> iluminated(L);
+    std::bitset<1000> illuminated;
     for (int i = 0; i < L; ++i)
     {
-         std::cin >>iluminated[i];
+        int lit;
+        std::cin >> lit;
+        illuminated.set(lit - 1);
     }
 
     int K;
@@ -22,17 +26,31 @@ int main() {
         {
             int lamp;
             std::cin >> lamp;
-            lampsOfSwitch[i].push_back(lamp);
+            lampsOfSwitch[i].push_back(lamp - 1);
         }
     }
 
-    for (int i = 0; i < nSwitches; ++i) {
-        std::cout << "Switch " << i + 1 << ": ";
-        for (int lamp : lampsOfSwitch[i]) {
-            std::cout << lamp << " ";
+    int switchesPressed = 0;
+    int nextToPress = 0;
+    std::unordered_set<std::bitset<1000>> visited;
+    while (!illuminated.none())
+    {
+        if (switchesPressed % nSwitches == 0 && visited.find(illuminated) != visited.end())
+        {
+            std::cout << -1 << std::endl;
+            return 0;
         }
-        std::cout << std::endl;
+
+        visited.insert(illuminated);
+        for (const int & lamp : lampsOfSwitch[nextToPress])
+        {
+            illuminated.flip(lamp);
+        }
+
+        ++switchesPressed;
+        nextToPress = (nextToPress + 1) % nSwitches;
     }
+    std::cout << switchesPressed << std::endl;
 
     return 0;
 }
