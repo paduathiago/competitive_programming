@@ -1,45 +1,101 @@
-#include <iostream>
 #include <algorithm>
+#include <iostream>
+#include <stack>
 #include <vector>
 
-bool areCoordinatesValid(int rows, int columns, std::pair<int, int> coordinates)
+bool areDirCoordinatesValid(const int rows, const int columns, const int dirX, const int dirY)
 {
-    return coordinates.first >= 0 && coordinates.first < rows &&
-           coordinates.second >= 0 && coordinates.second < columns;
+    return dirX >= 0 && dirX < rows &&
+           dirY >= 0 && dirY < columns;
 }
 
-// unsigned findBiggestNumberOfJumps(int rows, int columns, int board[rows][columns], std::pair<int, int> coordinates, bool isFirst = false)
-// {
-//     if (coordinates.first > rows - 1 || coordinates.first < 0 ||
-//         coordinates.second > columns - 1 || coordinates.second < 0)
-//         return 0;
+struct State
+{
+    int row, col;
+    unsigned jumps;
+    int prevDir;
+    std::vector<std::pair<int, int>> captured;
+};
 
-//     if (!isFirst && board[coordinates.first][coordinates.second] != 0)
-//         return 0;
+unsigned maxJumps(int rows, int columns, std::vector<std::vector<int>> board, std::pair<int, int> start)
+{
+    std::stack<State> stack;
+    stack.push ({start.first, start.second, 0, -1, {}});
 
-//     // jump on left upper diagonal
-//     int leftUpper = board[coordinates.first - 1][coordinates.second - 1] != 2 ||
-//                     !areCoordinatesValid(rows, columns, std::make_pair(coordinates.first , coordinates.second)) ?
-//                     0 :
-//                     findBiggestNumberOfJumps(rows, columns, board[rows][columns],
-//                     std::make_pair(--coordinates.first, --coordinates.second));  // avoid seg fault
+    unsigned maxJumps = 0;
 
-//     // jump on left lower diagonal
-//     int leftLower = findBiggestNumberOfJumps();
+    while (!stack.empty())
+    {
+        State currentState = stack.top();
+        stack.pop();
 
-//     // jump on right upper diagonal
-//     int rightUpper = findBiggestNumberOfJumps();
+        maxJumps = std::max(maxJumps, currentState.jumps);
 
-//     // jump on right lower diagonal
-//     int rightLower = findBiggestNumberOfJumps();
+        for (int dir = 1; dir <= 4; ++dir)
+        {
 
-//     if (isFirst)
-//         return std::max({leftUpper, leftLower, rightUpper, rightLower});
-//     else
-//     {
-//         return 1 + std::max({leftUpper, leftLower, rightUpper, rightLower})
-//     }
-// }
+            int dx1, dy1, dx2, dy2;
+            switch (dir)
+            {
+                case 1: // left upper
+                    if (currentState.prevDir == 4)
+                        continue;
+                    dx1 = -1;
+                    dy1 = -1;
+                    dx2 = -2;
+                    dy2 = -2;
+                    break;
+                case 2: // right upper
+                    if (currentState.prevDir == 3)
+                        continue;
+                    dx1 = 1;
+                    dy1 = -1;
+                    dx2 = 2;
+                    dy2 = -2;
+                    break;
+                case 3: // left lower
+                    if (currentState.prevDir == 2)
+                        continue;
+                    dx1 = -1;
+                    dy1 = 1;
+                    dx2 = -2;
+                    dy2 = 2;
+                    break;
+                case 4: // right lower
+                    if (currentState.prevDir == 1)
+                        continue;
+                    dx1 = 1;
+                    dy1 = 1;
+                    dx2 = 2;
+                    dy2 = 2;
+                    break;
+            }
+
+            if (!areDirCoordinatesValid(rows, columns, currentState.row + dx2, currentState.col + dy2))
+                continue;
+
+            // board[currentState.row + dx1][currentState.col + dy1] is the piece (position) jumped over
+            if (board[currentState.row + dx1][currentState.col + dy1] != 2)
+                continue;
+
+            if (board[currentState.row + dx2][currentState.col + dy2] != 0)
+                continue;
+
+            if (std::find(currentState.captured.begin(), currentState.captured.end(),
+                          std::make_pair(currentState.row + dx1, currentState.col + dy1))
+                          != currentState.captured.end())
+                continue;
+
+            auto newCaptured = currentState.captured;
+            newCaptured.push_back(std::make_pair(currentState.row + dx1, currentState.col + dy1));
+
+            stack.push({currentState.row + dx2, currentState.col + dy2, currentState.jumps + 1, dir,
+                           newCaptured});
+        }
+    }
+    return maxJumps;
+}
+
 
 int main() {
     int rows, columns;
@@ -56,7 +112,7 @@ int main() {
                 if (k % 2 == 0)
                 {
                     if(j % 2 == 1)
-                        board[i][j] = -1;
+                        board[i][j] = -2;
                     else
                     {
                         std::cin >> board[i][j];
@@ -69,7 +125,7 @@ int main() {
                 else
                 {
                     if(j % 2 == 0)
-                        board[i][j] = -1;
+                        board[i][j] = -2;
                     else
                     {
                         std::cin >> board[i][j];
@@ -83,19 +139,14 @@ int main() {
             ++k;
         }
 
-
-        // std::cout << findBiggestNumberOfJumps(rows, columns, board, myPieces[0], true) << std::endl;
-
-
-        // print board
-        for (int i = 0; i < rows; ++i)
+        unsigned maxCaptures = 0;
+        for (const auto& piece : myPieces)
         {
-            for (int j = 0; j < columns; ++j)
-            {
-            std::cout << board[i][j] << " ";
-            }
-            std::cout << std::endl;
+            unsigned jumps = maxJumps(rows, columns, board, piece);
+            if (jumps > maxCaptures)
+                maxCaptures = jumps;
         }
+        std::cout << maxCaptures << std::endl;
     }
 
     return 0;
