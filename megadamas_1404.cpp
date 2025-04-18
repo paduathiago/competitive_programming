@@ -37,38 +37,10 @@ unsigned maxJumps(int rows, int columns, std::vector<std::vector<int>> board, st
             int dx1, dy1, dx2, dy2;
             switch (dir)
             {
-                case 1: // left upper
-                    if (currentState.prevDir == 4)
-                        continue;
-                    dx1 = -1;
-                    dy1 = -1;
-                    dx2 = -2;
-                    dy2 = -2;
-                    break;
-                case 2: // right upper
-                    if (currentState.prevDir == 3)
-                        continue;
-                    dx1 = 1;
-                    dy1 = -1;
-                    dx2 = 2;
-                    dy2 = -2;
-                    break;
-                case 3: // left lower
-                    if (currentState.prevDir == 2)
-                        continue;
-                    dx1 = -1;
-                    dy1 = 1;
-                    dx2 = -2;
-                    dy2 = 2;
-                    break;
-                case 4: // right lower
-                    if (currentState.prevDir == 1)
-                        continue;
-                    dx1 = 1;
-                    dy1 = 1;
-                    dx2 = 2;
-                    dy2 = 2;
-                    break;
+                case 1: if (currentState.prevDir == 4) continue; dx1 = -1; dy1 = -1; dx2 = -2; dy2 = -2; break;
+                case 2: if (currentState.prevDir == 3) continue; dx1 = 1;  dy1 = -1; dx2 = 2;  dy2 = -2; break;
+                case 3: if (currentState.prevDir == 2) continue; dx1 = -1; dy1 = 1;  dx2 = -2; dy2 = 2;  break;
+                case 4: if (currentState.prevDir == 1) continue; dx1 = 1;  dy1 = 1;  dx2 = 2;  dy2 = 2;  break;
             }
 
             if (!areDirCoordinatesValid(rows, columns, currentState.row + dx2, currentState.col + dy2))
@@ -112,28 +84,23 @@ int main() {
                 if (k % 2 == 0)
                 {
                     if(j % 2 == 1)
-                        board[i][j] = -2;
-                    else
                     {
-                        std::cin >> board[i][j];
-                        if (board[i][j] == 1)
-                        {
-                            myPieces.push_back(std::make_pair(i, j));
-                        }
+                        board[i][j] = -2;
+                        continue;
                     }
                 }
                 else
                 {
                     if(j % 2 == 0)
-                        board[i][j] = -2;
-                    else
                     {
-                        std::cin >> board[i][j];
-                        if (board[i][j] == 1)
-                        {
-                            myPieces.push_back(std::make_pair(i, j));
-                        }
+                        board[i][j] = -2;
+                        continue;
                     }
+                }
+                std::cin >> board[i][j];
+                if (board[i][j] == 1)
+                {
+                    myPieces.push_back(std::make_pair(i, j));
                 }
             }
             ++k;
