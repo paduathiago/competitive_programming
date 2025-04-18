@@ -1,73 +1,59 @@
-#include <algorithm>
 #include <iostream>
-#include <stack>
 #include <vector>
 
-bool areDirCoordinatesValid(const int rows, const int columns, const int dirX, const int dirY)
+std::vector<std::vector<bool>> captured;
+int maxCaptures;
+
+bool areCoordinatesValid(const int rows, const int columns, const int dirX, const int dirY)
 {
     return dirX >= 0 && dirX < rows &&
            dirY >= 0 && dirY < columns;
 }
 
-struct State
+void maxJumps(const int rows, const int columns, std::vector<std::vector<int>>& board,
+              const std::pair<int, int> start, int current_captures)
 {
-    int row, col;
-    unsigned jumps;
-    int prevDir;
-    std::vector<std::pair<int, int>> captured;
-};
-
-unsigned maxJumps(int rows, int columns, std::vector<std::vector<int>> board, std::pair<int, int> start)
-{
-    std::stack<State> stack;
-    stack.push ({start.first, start.second, 0, -1, {}});
-
-    unsigned maxJumps = 0;
-
-    while (!stack.empty())
+    bool found = false;
+    for (int dir = 0; dir < 4; ++dir)
     {
-        State currentState = stack.top();
-        stack.pop();
 
-        maxJumps = std::max(maxJumps, currentState.jumps);
-
-        for (int dir = 1; dir <= 4; ++dir)
+        int dx1, dy1, dx2, dy2;
+        switch (dir)
         {
+            case 0: dx1 = -1; dy1 = -1; dx2 = -2; dy2 = -2; break;
+            case 1: dx1 = -1; dy1 = 1;  dx2 = -2; dy2 = 2;  break;
+            case 2: dx1 = 1;  dy1 = -1; dx2 = 2;  dy2 = -2; break;
+            case 3: dx1 = 1;  dy1 = 1;  dx2 = 2;  dy2 = 2;  break;
+        }
 
-            int dx1, dy1, dx2, dy2;
-            switch (dir)
+        int nx = start.first + dx1;
+        int ny = start.second + dy1;
+        int nx2 = start.first + dx2;
+        int ny2 = start.second + dy2;
+
+        if (areCoordinatesValid(rows, columns, nx2, ny2))
+        {
+            if (board[nx][ny] == 2 && board[nx2][ny2] == 0 && !captured[nx][ny])
             {
-                case 1: if (currentState.prevDir == 4) continue; dx1 = -1; dy1 = -1; dx2 = -2; dy2 = -2; break;
-                case 2: if (currentState.prevDir == 3) continue; dx1 = 1;  dy1 = -1; dx2 = 2;  dy2 = -2; break;
-                case 3: if (currentState.prevDir == 2) continue; dx1 = -1; dy1 = 1;  dx2 = -2; dy2 = 2;  break;
-                case 4: if (currentState.prevDir == 1) continue; dx1 = 1;  dy1 = 1;  dx2 = 2;  dy2 = 2;  break;
+                captured[nx][ny] = true;
+                int originalValue = board[start.first][start.second];
+                board[start.first][start.second] = 0;
+                int temp = board[nx2][ny2];
+                board[nx2][ny2] = 1;
+                maxJumps (rows, columns, board, std::make_pair(nx2, ny2), current_captures + 1);
+                board[start.first][start.second] = originalValue;
+                board[nx2][ny2] = temp;
+                captured[nx][ny] = false;
+                found = true;
             }
-
-            if (!areDirCoordinatesValid(rows, columns, currentState.row + dx2, currentState.col + dy2))
-                continue;
-
-            // board[currentState.row + dx1][currentState.col + dy1] is the piece (position) jumped over
-            if (board[currentState.row + dx1][currentState.col + dy1] != 2)
-                continue;
-
-            if (board[currentState.row + dx2][currentState.col + dy2] != 0)
-                continue;
-
-            if (std::find(currentState.captured.begin(), currentState.captured.end(),
-                          std::make_pair(currentState.row + dx1, currentState.col + dy1))
-                          != currentState.captured.end())
-                continue;
-
-            auto newCaptured = currentState.captured;
-            newCaptured.push_back(std::make_pair(currentState.row + dx1, currentState.col + dy1));
-
-            stack.push({currentState.row + dx2, currentState.col + dy2, currentState.jumps + 1, dir,
-                           newCaptured});
         }
     }
-    return maxJumps;
+    if (!found)
+    {
+        if (current_captures > maxCaptures)
+            maxCaptures = current_captures;
+    }
 }
-
 
 int main() {
     int rows, columns;
@@ -99,19 +85,16 @@ int main() {
                 }
                 std::cin >> board[i][j];
                 if (board[i][j] == 1)
-                {
                     myPieces.push_back(std::make_pair(i, j));
-                }
             }
             ++k;
         }
 
-        unsigned maxCaptures = 0;
+        maxCaptures = 0;
         for (const auto& piece : myPieces)
         {
-            unsigned jumps = maxJumps(rows, columns, board, piece);
-            if (jumps > maxCaptures)
-                maxCaptures = jumps;
+            captured.assign(rows, std::vector<bool>(columns, false));
+            maxJumps(rows, columns, board, piece, 0);
         }
         std::cout << maxCaptures << std::endl;
     }
