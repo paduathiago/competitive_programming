@@ -14,7 +14,8 @@ int dijkstra(const vector<vector<pair<int, int>>>& graph, int origin, int destin
     dist[origin] = 0;
     pq.push({0, origin});
 
-    while (!pq.empty()) {
+    while (!pq.empty())
+    {
         int current_dist = pq.top().first;
         int u = pq.top().second;
         pq.pop();
@@ -22,10 +23,12 @@ int dijkstra(const vector<vector<pair<int, int>>>& graph, int origin, int destin
         if (u == destination) break;
         if (current_dist > dist[u]) continue;
 
-        for (const auto& edge : graph[u]) {
+        for (const auto& edge : graph[u])
+        {
             int v = edge.first;
             int weight = edge.second;
-            if (dist[v] > dist[u] + weight) {
+            if (dist[v] > dist[u] + weight)
+            {
                 dist[v] = dist[u] + weight;
                 pq.push({dist[v], v});
             }
