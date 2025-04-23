@@ -35,7 +35,6 @@ int  splitHeader(const string& line)
     return parts.size() + 1;
 }
 
-
 vector<string> splitSellerLine(const string& line, int columns)
 {
     vector<string> parts;
@@ -51,7 +50,7 @@ vector<string> splitSellerLine(const string& line, int columns)
     parts.push_back(name);
 
     // total has as number of digits >= of each column
-    int totalSelled = ceil((line.size() - i + 1) / columns);
+    int totalSelled = ceil(static_cast<double>(line.size() - i) / columns);
     // cout << totalSelled << " " << (line.size() - i + 1) / columns << endl;
     string selled = line.substr(line.size() - totalSelled);
     cout << selled << endl;
