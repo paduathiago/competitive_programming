@@ -1,3 +1,5 @@
+#include <cmath>
+#include <iomanip>
 #include <iostream>
 #include <limits>
 #include <vector>
@@ -33,46 +35,36 @@ std::vector<int> dijkstra(const std::vector<std::vector<std::pair<int, int>>>& g
             {
                 minDistance = shortestDistance[edge.first];
                 nextNode = edge.first;
-                if (minDistance < shortestDistance[nextNode])
-                    previousNode[nextNode] = currentNode;
             }
         }
         currentNode = nextNode;
     }
 
     // Now we backtrack from the destination to find the shortest path
-    std::vector<int> shortestPath;
+    std::vector<int> reverseShortestPath;
 
     int nextNodePath = destination;
-    shortestPath.emplace_back(destination);
+    reverseShortestPath.emplace_back(destination);
 
     while(nextNodePath != origin)
     {
-        shortestPath.emplace_back(previousNode[nextNodePath]);
+        reverseShortestPath.emplace_back(previousNode[nextNodePath]);
         nextNodePath = previousNode[nextNodePath];
     }
 
-    return shortestPath;
+    return reverseShortestPath;
 }
 
-float probabilityOfPoint(int snipersOnPoint, int kBullets, float pProbability)
+// C(n, k) = n! / (k! * (n - k)!) using tgamma
+double combination(int b, int k)
 {
-    if (snipersOnPoint == 0)
-        return 1.0f;
+    if (k > b || k < 0)
+        return 0;
 
-    float probability = 1.0f;
-    for (int i = 0; i < snipersOnPoint; ++i)
-    {
-        probability *= (1 - pProbability);
-    }
-
-    for (int i = 0; i < kBullets; ++i)
-    {
-        probability *= pProbability;
-    }
-
-    return probability;
+    return std::tgamma(b + 1) / (std::tgamma(k + 1) * std::tgamma(b - k + 1));
 }
+
+
 
 int main() {
     int nStrategicPoints, mRoads, kBullets;
@@ -108,16 +100,23 @@ int main() {
         for (const auto& edge: edges)
         {
             graph[edge.first - 1].emplace_back(std::make_pair(edge.second - 1, snipersOnPoint[edge.second - 1]));
+            graph[edge.second - 1].emplace_back(std::make_pair(edge.first - 1, snipersOnPoint[edge.first - 1]));
         }
 
         std::cin >> origin >> destination;
 
-        std::vector<int> optimalPath = dijkstra(graph, origin, destination);
+        std::vector<int> reverseOptimalPath = dijkstra(graph, origin, destination);
 
-        for (const auto& element : optimalPath)
+        for (auto it = reverseOptimalPath.rbegin(); it != reverseOptimalPath.rend(); ++it)
         {
-            std::cout << element << " ";
+            std::cout << *it + 1 << " ";
         }
+        std::cout << std::endl;
+
+        std::vector<int> optimalPath(reverseOptimalPath.rbegin(), reverseOptimalPath.rend());
+
+        double finalProbability = calculatePathProbability(
+        std::cout << std::fixed << std::setprecision(3) << finalProbability << std::endl;
 
     }
 

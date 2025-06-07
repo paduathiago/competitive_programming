@@ -35,6 +35,44 @@ int  splitHeader(const string& line)
     return parts.size() + 1;
 }
 
+int sumSlices(const vector<string>& slices)
+{
+    int total = 0;
+    for (const string& slice : slices)
+    {
+        total += slice.size();
+    }
+    return total;
+}
+
+vector<string> divideSubString(string str, int columns)
+{
+    vector<string> parts;
+    vector<int> markers;
+    int partSize = ceil(static_cast<double>(str.size()) / columns);
+
+    int markerPosition = str.size() - partSize;
+    while (markerPosition > 0)
+    {
+        markers.push_back(markerPosition);
+        markerPosition -= partSize;
+    }
+
+    vector<string> slices(columns);
+    slices[0] = str.substr(0, markers[markers.size() - 1]);
+    for (int i = markers.size() - 1; i > 0; --i)
+    {
+        slices[i] = str.substr(markers[i], markers[i - 1] - markers[i]);
+    }
+    slices[columns - 1] = str.substr(markers[0], str.size() - markers[0]);
+
+    for (int i = 0; i < columns; ++i) // REMOVE
+    {
+        cout << slices[i] << " ";
+    }
+    return slices;
+}
+
 vector<string> splitSellerLine(const string& line, int columns)
 {
     vector<string> parts;
@@ -47,13 +85,18 @@ vector<string> splitSellerLine(const string& line, int columns)
         name += line[i];
         ++i;
     }
-    parts.push_back(name);
+    cout << name << " ";
 
     // total has as number of digits >= of each column
     int totalSelled = ceil(static_cast<double>(line.size() - i) / columns);
-    // cout << totalSelled << " " << (line.size() - i + 1) / columns << endl;
     string selled = line.substr(line.size() - totalSelled);
-    cout << selled << endl;
+    // cout << selled << endl;
+
+    // consider passing the entire string to divideSubString
+    int remainingStringSize = line.size() - i - totalSelled;
+    string remainingString = line.substr(i, remainingStringSize);
+    auto slices = divideSubString(remainingString, columns - 1);
+    cout << endl;
 
     return parts;
 }
